@@ -6,7 +6,7 @@ services:
     deploy:
       replicas: 1
       placement:
-        constraints: [node.hostname==pparbalmspr01]
+        constraints: [node.hostname==nodo01]
     ports:
       - "5000:5000"
     volumes:
