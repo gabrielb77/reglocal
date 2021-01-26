@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  reglocal:
+    image: localregistry:5000/registry:latest
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.hostname==pparbalmspr01]
+    ports:
+      - "5000:5000"
+    volumes:
+      - reglocal-storage:/var/lib/registry
+    environment:
+      - REGISTRY_HTTP_ADDR=0.0.0.0:5000
+      - REGISTRY_HTTP_TLS_CERTIFICATE=/run/secrets/reglocal.crt
+      - REGISTRY_HTTP_TLS_KEY=/run/secrets/reglocal.key
+      - REGISTRY_AUTH=htpasswd
+      - REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm
+      - REGISTRY_AUTH_HTPASSWD_PATH=/run/secrets/authlocalreg
+    secrets:
+      - reglocal.key
+      - reglocal.crt
+      - authlocalreg
+
+volumes:
+  reglocal-storage:
+    driver_opts:
+      type: "nfs"
+      o: "addr=172.30.0.20,nolock,soft,rw"
+      device: ":/ibm/cluster_docker/reglocal"
+
+secrets:
+  reglocal.key:
+    file: reglocal.key
+  reglocal.crt:
+    file: reglocal.crt
+  authlocalreg:
+    file: authlocalreg
+   
